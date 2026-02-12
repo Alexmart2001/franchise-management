@@ -1,16 +1,25 @@
 server:
   port: 8080
+
 spring:
   application:
-    name: "franchise-management"
-  devtools:
-    add-properties: false
-  h2:
-    console:
-      enabled: true
-      path: "/h2"
-  profiles:
-    include: null
+    name: franchise-management
+  r2dbc:
+    url: r2dbc:postgresql://localhost:5432/franchise_db
+    username: admin
+    password: nequiTest123
+  datasource:
+    driver-class-name: org.postgresql.Driver
+
+adapters:
+  r2dbc:
+    host: localhost
+    port: 5432
+    database: franchise_db
+    schema: public
+    username: admin
+    password: nequiTest123
+
 management:
   endpoints:
     web:
@@ -20,5 +29,11 @@ management:
     health:
       probes:
         enabled: true
+
 cors:
   allowed-origins: "http://localhost:4200,http://localhost:8080"
+
+logging:
+  level:
+    org.springframework.r2dbc: DEBUG
+    org.springframework.data.r2dbc: DEBUG
