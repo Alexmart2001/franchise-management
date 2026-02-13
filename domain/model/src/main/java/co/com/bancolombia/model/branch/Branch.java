@@ -1,11 +1,13 @@
 package co.com.bancolombia.model.branch;
 
 
-import lombok.Data;
+import lombok.Builder;
+import lombok.Value;
 
-@Data
+@Value
+@Builder(toBuilder = true)
 public class Branch {
-    private Integer id;
-    private String name;
-    private Integer franchiseId;
+     Integer id;
+     String name;
+     Integer franchiseId;
 }
