@@ -50,7 +50,7 @@ public class ProductRepositoryAdapter implements ProductRepository {
     @Override
     public Flux<Product> findMaxStockByFranchise(Integer franchiseId) {
         log.debug("Finding max stock products by franchiseId: {}", franchiseId);
-        return productDataRepository.findTopByBranchIdOrderByStockDesc(franchiseId)
+        return productDataRepository.findMaxStockByFranchise(franchiseId)
                 .doOnComplete(() -> log.info("Completed finding max stock products for franchiseId: {}", franchiseId))
                 .doOnError(ex -> log.error("Error finding max stock products for franchiseId: {}", franchiseId, ex))
                 .map(ProductEntity::toDomain);

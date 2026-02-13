@@ -46,6 +46,11 @@ public class ProductUseCase {
                 .flatMap(product -> productRepository.deleteById(id));
     }
 
+    public Flux<Product> findMaxStockByFranchise(Integer franchiseId) {
+        return validateId(franchiseId)
+                .thenMany(productRepository.findMaxStockByFranchise(franchiseId));
+    }
+
     public Mono<Product> findById(Integer id) {
         return validateId(id)
                 .then(findOrThrow(id));
