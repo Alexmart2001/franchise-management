@@ -5,8 +5,8 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 public interface FranchiseRepository {
-    Mono<Franchise> save (Franchise franchise);
-    Mono<Franchise> updateName(Integer id, String newName);
+    Mono<Franchise> save(Franchise franchise);
     Mono<Franchise> findById(Integer id);
+    Mono<Void> deleteById(Integer id);
     Flux<Franchise> findAll();
 }

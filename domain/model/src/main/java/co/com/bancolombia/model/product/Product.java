@@ -1,12 +1,14 @@
 package co.com.bancolombia.model.product;
 
 
-import lombok.Data;
+import lombok.Builder;
+import lombok.Value;
 
-@Data
+@Value
+@Builder(toBuilder = true)
 public class Product {
-    private Integer id;
-    private String name;
-    private Integer stock;
-    private Integer branchId;
+     Integer id;
+     String name;
+     Integer stock;
+     Integer branchId;
 }

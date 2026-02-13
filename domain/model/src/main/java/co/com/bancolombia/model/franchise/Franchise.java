@@ -1,9 +1,11 @@
 package co.com.bancolombia.model.franchise;
 
-import lombok.Data;
+import lombok.Builder;
+import lombok.Value;
 
-@Data
+@Value
+@Builder(toBuilder = true)
 public class Franchise {
-    private Integer id;
-    private String name;
+     Integer id;
+     String name;
 }
