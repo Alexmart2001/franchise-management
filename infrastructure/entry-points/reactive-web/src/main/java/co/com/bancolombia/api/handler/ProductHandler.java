@@ -37,6 +37,10 @@ public class ProductHandler {
                 .doOnError(ex -> log.error("Error creating product", ex));
     }
 
+    /**
+     * Metodo necesario para valicaciones internas de producto
+     * No se expone en router debido a que no es requerido en la prueba
+     */
     public Mono<ServerResponse> findById(ServerRequest request) {
         Integer id = Integer.valueOf(request.pathVariable("id"));
 

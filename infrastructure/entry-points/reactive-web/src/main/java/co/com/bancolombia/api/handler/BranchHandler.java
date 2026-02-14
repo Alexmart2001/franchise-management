@@ -40,6 +40,10 @@ public class BranchHandler {
                 .doOnError(ex -> log.error("Error creating branch", ex));
     }
 
+    /**
+     * Endpoint para agregar una nueva sucursal a una franquicia.
+     * Requisito obligatorio según la prueba.
+     */
     public Mono<ServerResponse> findById(ServerRequest request) {
         Integer id = Integer.valueOf(request.pathVariable("id"));
 
