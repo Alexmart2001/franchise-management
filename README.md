@@ -1,47 +1,244 @@
 # Proyecto Base Implementando Clean Architecture
 
-## Antes de Iniciar
+## Descripci√≥n del Proyecto
 
-Empezaremos por explicar los diferentes componentes del proyectos y partiremos de los componentes externos, continuando con los componentes core de negocio (dominio) y por ˙ltimo el inicio y configuraciÛn de la aplicaciÛn.
+El proyecto est√° dise√±ado para manejar una lista de franquicias, sucursales y productos ofertados mediante una API reactiva empleando **Spring Boot WebFlux**. La implementaci√≥n se desarrolla utilizando la **Arquitectura Hexagonal (Clean Architecture)**, lo que permite aislar los detalles t√©cnicos y centrarse en las reglas del negocio.
 
-Lee el artÌculo [Clean Architecture ó Aislando los detalles](https://medium.com/bancolombia-tech/clean-architecture-aislando-los-detalles-4f9530f35d7a)
+Las entidades principales son:
+1. **Franquicia**: Compuesta de un nombre y lista de sucursales.
+2. **Sucursal**: Compuesta de un nombre y lista de productos ofertados.
+3. **Producto**: Compuesto de un nombre y un stock.
 
-# Arquitectura
+---
 
-![Clean Architecture](https://miro.medium.com/max/1400/1*ZdlHz8B0-qu9Y-QO3AXR_w.png)
+## Arquitectura del Proyecto
 
-## Domain
+El proyecto fue desarrollado siguiendo la Clean Architecture, dividiendo en capas independientes como se describe a continuaci√≥n:
 
-Es el mÛdulo m·s interno de la arquitectura, pertenece a la capa del dominio y encapsula la lÛgica y reglas del negocio mediante modelos y entidades del dominio.
+### 1. **Domain**
+Encapsula la l√≥gica y reglas del negocio mediante modelos y entidades. Aqu√≠ se encuentran las definiciones principales relacionadas con los objetos **Franquicias**, **Sucursales**, y **Productos**.
 
-## Usecases
+### 2. **Usecases**
+Es quien implementa los casos de uso del sistema. Define la l√≥gica de los flujos y orquesta las interacciones entre entidades.
 
-Este mÛdulo gradle perteneciente a la capa del dominio, implementa los casos de uso del sistema, define lÛgica de aplicaciÛn y reacciona a las invocaciones desde el mÛdulo de entry points, orquestando los flujos hacia el mÛdulo de entities.
+### 3. **Infrastructure**
+#### Helpers
+Incluye clases gen√©ricas que facilitan la implementaci√≥n de patrones como **Repository** y **Unit of Work**, √∫tiles para interactuar con sistemas de persistencia externa.
 
-## Infrastructure
+#### Driven Adapters
+Implementan conexiones externas como bases de datos (PostgreSQL en este caso), servicios REST, o cualquier interacci√≥n con fuentes de datos externas.
 
-### Helpers
+#### Entry Points
+Define los puntos de entrada al sistema, expose controladores REST para interactuar con los flujos del negocio.
 
-En el apartado de helpers tendremos utilidades generales para los Driven Adapters y Entry Points.
+### 4. **Application**
+Encargada de ensamblar todos los m√≥dulos, resolver dependencias y ejecutar la aplicaci√≥n con el m√©todo `main`. Implementa un `@ComponentScan` que asegura la disponibilidad autom√°tica de los beans definidos en las capas internas.
 
-Estas utilidades no est·n arraigadas a objetos concretos, se realiza el uso de generics para modelar comportamientos
-genÈricos de los diferentes objetos de persistencia que puedan existir, este tipo de implementaciones se realizan
-basadas en el patrÛn de diseÒo [Unit of Work y Repository](https://medium.com/@krzychukosobudzki/repository-design-pattern-bc490b256006)
+---
 
-Estas clases no puede existir solas y debe heredarse su compartimiento en los **Driven Adapters**
+## Requisitos T√©cnicos
 
-### Driven Adapters
+### **Tecnolog√≠as Requeridas**
+- **Framework**: Spring Boot 3 y WebFlux.
+- **Base de Datos**: PostgreSQL (utilizando Docker).
+- **Clean Architecture**: Estructura de m√≥dulos creada desde el plugin oficial Scaffold.
+- **Automatizaci√≥n de tareas**: Gradle.
+- **Lenguaje de programaci√≥n**: Java 17 o superior.
+- **APIs**: Estilo RESTful.
+- **Pruebas Unitarias**: JUnit asegurando una cobertura superior al 60%.
+- **Logs**: Implementados con SLF4J/Log4j.
 
-Los driven adapter representan implementaciones externas a nuestro sistema, como lo son conexiones a servicios rest,
-soap, bases de datos, lectura de archivos planos, y en concreto cualquier origen y fuente de datos con la que debamos
-interactuar.
+---
 
-### Entry Points
+## Instalaci√≥n y Ejecuci√≥n del Proyecto
 
-Los entry points representan los puntos de entrada de la aplicaciÛn o el inicio de los flujos de negocio.
+### Requisitos Previos
+- **Java**: JDK 17 o superior instalado y configurado en el PATH.
+- **Gradle**: Versi√≥n 9.2.1 o superior instalado (o utiliza el wrapper del proyecto).
+- **Docker**: Para configurar la base de datos PostgreSQL localmente.
 
-## Application
+### Pasos para implementar el Proyecto
 
-Este mÛdulo es el m·s externo de la arquitectura, es el encargado de ensamblar los distintos mÛdulos, resolver las dependencias y crear los beans de los casos de use (UseCases) de forma autom·tica, inyectando en Èstos instancias concretas de las dependencias declaradas. Adem·s inicia la aplicaciÛn (es el ˙nico mÛdulo del proyecto donde encontraremos la funciÛn ìpublic static void main(String[] args)î.
+#### **1. Generaci√≥n del Proyecto Base**
+Ejecuta los siguientes comandos en tu terminal. 
 
-**Los beans de los casos de uso se disponibilizan automaticamente gracias a un '@ComponentScan' ubicado en esta capa.**
+```bash
+# Crear carpeta de proyecto
+mkdir franchise-management
+cd franchise-management
+
+# Crear el archivo build.gradle con el plugin Clean Architecture
+(
+echo plugins {
+echo     id 'co.com.bancolombia.cleanArchitecture' version '4.0.5'
+echo }
+) > build.gradle
+
+# Generar el wrapper para Gradle
+gradle wrapper
+
+# Generar el proyecto base
+./gradlew ca --name=franchise-management
+
+# Crear entry point de tipo Webflux
+./gradlew gep --type webflux
+
+# Proyecto Base: Franquicia Management
+
+## Configuraci√≥n de la Base de Datos
+
+### Crear las Tablas
+Ejecuta el siguiente script para crear las tablas en PostgreSQL:
+
+```sql
+CREATE TABLE franchise (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(255) NOT NULL
+);
+
+CREATE TABLE branch (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    franchise_id INTEGER NOT NULL,
+    FOREIGN KEY (franchise_id) REFERENCES franchise(id) ON DELETE CASCADE
+);
+
+CREATE TABLE product (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    stock INTEGER NOT NULL CHECK (stock >= 0),
+    branch_id INTEGER NOT NULL,
+    FOREIGN KEY (branch_id) REFERENCES branch(id) ON DELETE CASCADE
+);
+
+
+# Proyecto Base: Gesti√≥n de Franquicias
+
+## Configuraci√≥n de la Conexi√≥n a la Base de Datos
+Modifica el archivo `application.yaml` ubicado en la ruta `applications/app-service/src/main/resources/` para incluir los datos de conexi√≥n:
+
+```yaml
+spring:
+  r2dbc:
+    url: r2dbc:postgresql://localhost:5432/franchise_db
+    username: admin
+    password: nequiTest123
+
+
+# Proyecto: Gesti√≥n de Franquicias
+
+## Ejecuci√≥n y Verificaci√≥n
+
+Ejecuta el proyecto localmente utilizando el siguiente comando en la terminal:
+
+```bash
+./gradlew bootRun
+
+
+# Endpoints Disponibles
+
+### 1. **Crear Franquicia**
+**POST** `/api/franchises`
+
+#### Cuerpo de la petici√≥n:
+```json
+{
+  "name": "Franquicia A"
+}
+
+# Endpoints Disponibles
+
+### 2. **Crear Sucursal para una Franquicia**
+**POST** `/api/franchises/{franchiseId}/branches`
+
+#### Cuerpo de la petici√≥n:
+```json
+{
+  "name": "Sucursal A"
+}
+
+
+### 3. **Agregar Producto a una Sucursal**
+**POST** `/api/branches/{branchId}/products`
+
+#### Cuerpo de la petici√≥n:
+```json
+{
+  "name": "Producto X",
+  "stock": 150
+}
+
+
+### 4. **Modificar Stock de un Producto**
+**PUT** `/api/branches/{branchId}/products/{productId}`
+
+#### Cuerpo de la petici√≥n:
+```json
+{
+  "stock": 200
+}
+
+### 5. **Consultar el Producto con Mayor Stock**
+**GET** `/api/franchises/{franchiseId}/top-products`
+
+#### Respuesta esperada:
+```json
+[
+  {
+    "productName": "Producto X",
+    "stock": "200",
+    "branchName": "Sucursal A"
+  },
+  {
+    "productName": "Producto Y",
+    "stock": "250",
+    "branchName": "Sucursal B"
+  }
+]
+
+## Extras (Opcionales)
+
+- **Actualizar el nombre de Franquicia**, **Sucursal**, o **Producto** utilizando m√©todos **PUT**.
+
+---
+
+## Decisiones de Dise√±o
+
+### 1. **Entorno Reactivo con Spring WebFlux**
+Todas las librer√≠as utilizadas son compatibles con el entorno reactivo, asegurando un manejo eficiente de las se√±ales:
+- `onNext`
+- `onError`
+- `onComplete`.
+
+---
+
+### 2. **Operadores Reactivos**
+Los flujos de datos se manejan mediante operadores reactivos como:
+- `map`
+- `flatMap`
+- `switchIfEmpty`
+- `zip`.
+
+Estos operadores garantizan:
+- **Encadenabilidad √≥ptima** de las respuestas.
+- **Mayor eficiencia** en la l√≥gica y procesamiento de los flujos de negocio.
+
+
+### 3. **Base de Datos PostgreSQL**
+PostgreSQL fue seleccionada por sus caracter√≠sticas:
+- **Robusteza** y capacidad para manejar datos relacionales.
+- Excelente compatibilidad con entornos **containerizados** utilizando Docker.
+- La base de datos **se encuentra montada en la nube**, lo que asegura escalabilidad, accesibilidad y alta disponibilidad para el proyecto.
+
+---
+
+### 4. **Pruebas Unitarias**
+Pruebas realizadas mediante **JUnit 5**, obteniendo:
+- **Cobertura m√≠nima asegurada de 60%**.
+- **Cobertura lograda del 72%**, superando el objetivo m√≠nimo y validando la l√≥gica del negocio de manera aceptable.
+
+### 5. **Estado del Proyecto**
+El proyecto est√° **listo para ser ejecutado localmente** una vez se cumplan los requerimientos previos. Levanta la aplicaci√≥n utilizando el siguiente comando:
+
+```bash
+./gradlew bootRun
