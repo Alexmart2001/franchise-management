@@ -4,6 +4,8 @@ allprojects {
     repositories {
         //mavenLocal()
         mavenCentral()
+        maven { url = "https://repo.spring.io/snapshot" }
+        maven { url = "https://repo.spring.io/milestone" }
     }
 }
 
@@ -17,7 +19,8 @@ subprojects {
 
     java {
         toolchain {
-            languageVersion = JavaLanguageVersion.of(17)
+            sourceCompatibility = JavaVersion.VERSION_17
+            targetCompatibility = JavaVersion.VERSION_17
         }
     }
 
@@ -31,7 +34,7 @@ subprojects {
         implementation 'io.projectreactor:reactor-core'
         implementation 'io.projectreactor.addons:reactor-extra'
 
-        testImplementation 'io.projectreactor.tools:blockhound-junit-platform:1.0.15.RELEASE'
+        testImplementation 'io.projectreactor.tools:blockhound-junit-platform:1.0.13.RELEASE'
 
         testImplementation 'io.projectreactor:reactor-test'
         testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
@@ -57,7 +60,7 @@ subprojects {
         targetClasses = ['co.com.bancolombia.*']
         excludedClasses = []
         excludedTestClasses = []
-        pitestVersion = '1.22.0'
+        pitestVersion = '1.20.1'
         verbose = false
         outputFormats = ['XML', 'HTML']
         threads = 8
@@ -67,7 +70,7 @@ subprojects {
         timestampedReports = false
         //mutators = ['STRONGER', 'DEFAULTS']
         fileExtensionsToFilter.addAll('xml', 'orbit')
-        junit5PluginVersion = '1.2.3'
+        junit5PluginVersion = '1.2.2'
         failWhenNoMutations = false
         jvmArgs = ["-XX:+AllowRedefinitionToAddDeleteMethods"]
     }

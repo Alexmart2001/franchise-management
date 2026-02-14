@@ -1,11 +1,14 @@
 package co.com.bancolombia.api.config;
 
+import co.com.bancolombia.api.router.RouterRest;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webflux.test.autoconfigure.WebFluxTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.reactive.server.WebTestClient;
+
+import java.util.logging.Handler;
 
 @ContextConfiguration(classes = {RouterRest.class, Handler.class})
 @WebFluxTest
