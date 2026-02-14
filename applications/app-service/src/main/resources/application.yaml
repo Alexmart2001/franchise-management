@@ -5,20 +5,20 @@ spring:
   application:
     name: franchise-management
   r2dbc:
-    url: r2dbc:postgresql://localhost:5432/franchise_db
-    username: admin
-    password: nequiTest123
+    url: r2dbc:postgresql://switchback.proxy.rlwy.net:41210/railway
+    username: postgres
+    password: IHPmubXbpogovGBKoCgWgaTaKgJxkZNJ
   datasource:
     driver-class-name: org.postgresql.Driver
 
 adapters:
   r2dbc:
-    host: localhost
-    port: 5432
-    database: franchise_db
+    host: switchback.proxy.rlwy.net
+    port: 41210
+    database: railway
     schema: public
-    username: admin
-    password: nequiTest123
+    username: postgres
+    password: IHPmubXbpogovGBKoCgWgaTaKgJxkZNJ
 
 management:
   endpoints:

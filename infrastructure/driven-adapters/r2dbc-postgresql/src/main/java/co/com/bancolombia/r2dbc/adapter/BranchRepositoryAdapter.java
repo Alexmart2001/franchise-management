@@ -39,14 +39,6 @@ public class BranchRepositoryAdapter implements BranchRepository {
     }
 
     @Override
-    public Mono<Void> deleteById(Integer id) {
-        log.info("Deleting branch by id: {}", id);
-        return branchDataRepository.deleteById(id)
-                .doOnSuccess(v -> log.info("Branch deleted: {}", id))
-                .doOnError(ex -> log.error("Error deleting branch by id: {}", id, ex));
-    }
-
-    @Override
     public Flux<Branch> findByFranchiseId(Integer franchiseId) {
         log.debug("Finding branches by franchiseId: {}", franchiseId);
         return branchDataRepository.findByFranchiseId(franchiseId)

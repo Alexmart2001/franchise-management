@@ -92,12 +92,4 @@ public class BranchHandler {
                 .switchIfEmpty(ServerResponse.notFound().build())
                 .doOnError(ex -> log.error("Error updating branch name for id: {}", id, ex));
     }
-
-    public Mono<ServerResponse> delete(ServerRequest request) {
-        Integer id = Integer.valueOf(request.pathVariable("id"));
-
-        return branchUseCase.delete(id)
-                .then(ServerResponse.noContent().build())
-                .doOnError(ex -> log.error("Error deleting branch by id: {}", id, ex));
-    }
 }

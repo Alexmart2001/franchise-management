@@ -49,19 +49,6 @@ public class ProductHandler {
                 .doOnError(ex -> log.error("Error finding product by id: {}", id, ex));
     }
 
-    public Mono<ServerResponse> findByBranchId(ServerRequest request) {
-        Integer branchId = Integer.valueOf(request.pathVariable("branchId"));
-
-        return ServerResponse.ok()
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(
-                        productUseCase.findByBranchId(branchId)
-                                .map(this::toResponse),
-                        ProductResponse.class
-                )
-                .doOnError(ex -> log.error("Error finding products by branchId: {}", branchId, ex));
-    }
-
     public Mono<ServerResponse> updateName(ServerRequest request) {
         Integer id = Integer.valueOf(request.pathVariable("id"));
 

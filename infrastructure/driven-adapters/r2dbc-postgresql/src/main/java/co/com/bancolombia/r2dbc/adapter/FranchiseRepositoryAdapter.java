@@ -7,7 +7,6 @@ import co.com.bancolombia.r2dbc.repository.FranchiseDataRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Slf4j
@@ -36,23 +35,6 @@ public class FranchiseRepositoryAdapter implements FranchiseRepository {
                     else log.warn("Franchise not found for id: {}", id);
                 })
                 .doOnError(ex -> log.error("Error finding franchise by id: {}", id, ex))
-                .map(FranchiseEntity::toDomain);
-    }
-
-    @Override
-    public Mono<Void> deleteById(Integer id) {
-        log.info("Deleting franchise by id: {}", id);
-        return franchiseDataRepository.deleteById(id)
-                .doOnSuccess(v -> log.info("Franchise deleted: {}", id))
-                .doOnError(ex -> log.error("Error deleting franchise by id: {}", id, ex));
-    }
-
-    @Override
-    public Flux<Franchise> findAll() {
-        log.debug("Finding all franchises");
-        return franchiseDataRepository.findAll()
-                .doOnComplete(() -> log.info("Completed finding all franchises"))
-                .doOnError(ex -> log.error("Error finding all franchises", ex))
                 .map(FranchiseEntity::toDomain);
     }
 }

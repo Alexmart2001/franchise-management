@@ -56,11 +56,6 @@ public class ProductUseCase {
                 .then(findOrThrow(id));
     }
 
-    public Flux<Product> findByBranchId(Integer branchId) {
-        return validateId(branchId)
-                .thenMany(productRepository.findByBranchId(branchId));
-    }
-
     private Mono<Product> findOrThrow(Integer id) {
         return productRepository.findById(id)
                 .switchIfEmpty(Mono.error(
