@@ -20,30 +20,36 @@ public class ProductUseCase {
                 .then(productRepository.save(product));
     }
 
-    public Mono<Product> updateName(Integer id, String newName) {
-        return validateId(id)
+    public Mono<Product> updateName(Integer productId, Integer branchId, String newName) {
+        return validateId(productId)
                 .then(validateName(newName))
-                .then(findOrThrow(id))
+                .then(productRepository.findByIdAndBranch(productId, branchId))
                 .map(product -> product.toBuilder()
                         .name(newName)
                         .build())
                 .flatMap(productRepository::save);
     }
 
-    public Mono<Product> updateStock(Integer id, Integer newStock) {
-        return validateId(id)
+    public Mono<Product> updateStock(Integer productId, Integer branchId, Integer newStock) {
+        return validateId(productId)
                 .then(validateStock(newStock))
-                .then(findOrThrow(id))
+                .then(productRepository.findByIdAndBranch(productId, branchId))
                 .map(product -> product.toBuilder()
                         .stock(newStock)
                         .build())
                 .flatMap(productRepository::save);
     }
 
-    public Mono<Void> delete(Integer id) {
-        return validateId(id)
-                .then(findOrThrow(id))
-                .flatMap(product -> productRepository.deleteById(id));
+    public Mono<Void> delete(Integer productId, Integer branchId) {
+        return validateId(productId)
+                .then(validateBranchExists(branchId))
+                .then(productRepository.existsInBranch(productId, branchId))
+                .flatMap(exists -> {
+                    if (!exists) {
+                        return Mono.error(new RuntimeException("Product does not belong to the specified branch."));
+                    }
+                    return productRepository.deleteByIdAndBranch(productId, branchId);
+                });
     }
 
     public Flux<Product> findMaxStockByFranchise(Integer franchiseId) {

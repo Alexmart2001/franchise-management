@@ -25,7 +25,6 @@ public class RouterRest {
                 .andRoute(PATCH("/franchises/{id}/name"), franchiseHandler::updateName)
                 // Branch endpoints
                 .andRoute(POST("/branches"), branchHandler::create)
-                .andRoute(GET("/franchises/{franchiseId}/branches"), branchHandler::findByFranchiseId)
                 .andRoute(PATCH("/branches/{id}/name"), branchHandler::updateName)
                 // Product endpoints
                 .andRoute(POST("/products"), productHandler::create)
