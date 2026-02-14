@@ -235,7 +235,7 @@ PostgreSQL fue seleccionada por sus características:
 ### 4. **Pruebas Unitarias**
 Pruebas realizadas mediante **JUnit 5**, obteniendo:
 - **Cobertura mínima asegurada de 60%**.
-- **Cobertura lograda del 72%**, superando el objetivo mínimo y validando la lógica del negocio de manera aceptable.
+- **Cobertura lograda del 65%**, superando el objetivo mínimo y validando la lógica del negocio de manera aceptable.
 
 ### 5. **Estado del Proyecto**
 El proyecto está **listo para ser ejecutado localmente** una vez se cumplan los requerimientos previos. Levanta la aplicación utilizando el siguiente comando:
