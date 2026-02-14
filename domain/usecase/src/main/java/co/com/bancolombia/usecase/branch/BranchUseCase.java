@@ -32,13 +32,6 @@ public class BranchUseCase {
                 .flatMap(branchRepository::save);
     }
 
-    public Mono<Void> delete(Integer id) {
-        return validateId(id)
-                .then(findOrThrow(id))
-                .then(validateBranchHasNoProducts(id))
-                .then(branchRepository.deleteById(id));
-    }
-
     public Mono<Branch> findById(Integer id) {
         return validateId(id)
                 .then(findOrThrow(id));
@@ -60,17 +53,6 @@ public class BranchUseCase {
                 .switchIfEmpty(Mono.error(
                         new BusinessException("FRANCHISE_NOT_FOUND", "Franchise not found")))
                 .then();
-    }
-
-    private Mono<Void> validateBranchHasNoProducts(Integer branchId) {
-        return productRepository.findByBranchId(branchId)
-                .hasElements()
-                .flatMap(hasProducts -> {
-                    if (hasProducts)
-                        return Mono.error(new BusinessException(
-                                "BRANCH_HAS_PRODUCTS", "Cannot delete branch with products"));
-                    return Mono.empty();
-                });
     }
 
     private Mono<Void> validateBranch(Branch branch) {

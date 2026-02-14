@@ -5,7 +5,6 @@ import co.com.bancolombia.model.franchise.Franchise;
 import co.com.bancolombia.model.franchise.gateways.FranchiseRepository;
 import co.com.bancolombia.usecase.commons.BusinessException;
 import lombok.RequiredArgsConstructor;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @RequiredArgsConstructor
@@ -29,37 +28,15 @@ public class FranchiseUseCase {
                 .flatMap(franchiseRepository::save);
     }
 
-    public Mono<Void> delete(Integer id) {
-        return validateId(id)
-                .then(findOrThrow(id))
-                .then(validateFranchiseHasNoBranches(id))
-                .then(franchiseRepository.deleteById(id));
-    }
-
     public Mono<Franchise> findById(Integer id) {
         return validateId(id)
                 .then(findOrThrow(id));
-    }
-
-    public Flux<Franchise> findAll() {
-        return franchiseRepository.findAll();
     }
 
     private Mono<Franchise> findOrThrow(Integer id) {
         return franchiseRepository.findById(id)
                 .switchIfEmpty(Mono.error(
                         new BusinessException("FRANCHISE_NOT_FOUND", "Franchise not found")));
-    }
-
-    private Mono<Void> validateFranchiseHasNoBranches(Integer franchiseId) {
-        return branchRepository.findByFranchiseId(franchiseId)
-                .hasElements()
-                .flatMap(hasBranches -> {
-                    if (hasBranches)
-                        return Mono.error(new BusinessException(
-                                "FRANCHISE_HAS_BRANCHES", "Cannot delete franchise with branches"));
-                    return Mono.empty();
-                });
     }
 
     private Mono<Void> validateFranchise(Franchise franchise) {

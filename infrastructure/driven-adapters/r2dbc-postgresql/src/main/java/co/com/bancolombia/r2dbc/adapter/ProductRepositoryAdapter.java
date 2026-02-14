@@ -39,15 +39,6 @@ public class ProductRepositoryAdapter implements ProductRepository {
     }
 
     @Override
-    public Flux<Product> findByBranchId(Integer branchId) {
-        log.debug("Finding products by branchId: {}", branchId);
-        return productDataRepository.findByBranchId(branchId)
-                .doOnComplete(() -> log.info("Completed finding products for branchId: {}", branchId))
-                .doOnError(ex -> log.error("Error finding products for branchId: {}", branchId, ex))
-                .map(ProductEntity::toDomain);
-    }
-
-    @Override
     public Flux<Product> findMaxStockByFranchise(Integer franchiseId) {
         log.debug("Finding max stock products by franchiseId: {}", franchiseId);
         return productDataRepository.findMaxStockByFranchise(franchiseId)

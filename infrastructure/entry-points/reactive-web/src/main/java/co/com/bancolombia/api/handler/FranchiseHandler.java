@@ -54,21 +54,6 @@ public class FranchiseHandler {
                 .doOnError(ex -> log.error("Error finding franchise by id: {}", id, ex));
     }
 
-    public Mono<ServerResponse> findAll(ServerRequest request) {
-        return ServerResponse.ok()
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(
-                        franchiseUseCase.findAll()
-                                .map(franchise -> FranchiseResponse.builder()
-                                        .id(franchise.getId())
-                                        .name(franchise.getName())
-                                        .build()
-                                ),
-                        FranchiseResponse.class
-                )
-                .doOnError(ex -> log.error("Error finding all franchises", ex));
-    }
-
     public Mono<ServerResponse> updateName(ServerRequest request) {
         Integer id = Integer.valueOf(request.pathVariable("id"));
 
@@ -84,13 +69,5 @@ public class FranchiseHandler {
                         .bodyValue(response))
                 .switchIfEmpty(ServerResponse.notFound().build())
                 .doOnError(ex -> log.error("Error updating franchise name for id: {}", id, ex));
-    }
-
-    public Mono<ServerResponse> delete(ServerRequest request) {
-        Integer id = Integer.valueOf(request.pathVariable("id"));
-
-        return franchiseUseCase.delete(id)
-                .then(ServerResponse.noContent().build())
-                .doOnError(ex -> log.error("Error deleting franchise by id: {}", id, ex));
     }
 }
