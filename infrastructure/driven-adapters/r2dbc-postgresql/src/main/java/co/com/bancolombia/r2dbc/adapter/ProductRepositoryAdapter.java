@@ -48,10 +48,45 @@ public class ProductRepositoryAdapter implements ProductRepository {
     }
 
     @Override
-    public Mono<Void> deleteById(Integer id) {
-        log.info("Deleting product by id: {}", id);
-        return productDataRepository.deleteById(id)
-                .doOnSuccess(v -> log.info("Product deleted: {}", id))
-                .doOnError(ex -> log.error("Error deleting product by id: {}", id, ex));
+    public Mono<Void> deleteByIdAndBranch(Integer productId, Integer branchId) {
+        log.info("Deleting product: productId={} branchId={}", productId, branchId);
+        return existsInBranch(productId, branchId)
+                .flatMap(exists -> {
+                    if (exists) {
+                        return productDataRepository.deleteById(productId)
+                                .doOnSuccess(v -> log.info("Product {} deleted from branch {}", productId, branchId))
+                                .doOnError(ex -> log.error("Error deleting product {} from branch {}", productId, branchId, ex));
+                    } else {
+                        log.warn("Attempted to delete product {} that does not belong to branch {}", productId, branchId);
+                        return Mono.error(new RuntimeException("Product does not belong to the specified branch."));
+                    }
+                });
+    }
+    @Override
+    public Mono<Boolean> existsInBranch(Integer productId, Integer branchId) {
+        log.debug("Verifying product exists in branch: productId={} branchId={}", productId, branchId);
+        return productDataRepository.findById(productId)
+                .filter(productEntity -> productEntity.getBranchId().equals(branchId))
+                .hasElement()
+                .doOnSuccess(exists -> {
+                    if (Boolean.TRUE.equals(exists)) log.info("Product {} exists in branch {}", productId, branchId);
+                    else log.warn("Product {} does not exist in branch {}", productId, branchId);
+                })
+                .doOnError(ex -> log.error("Error verifying product exists in branch: productId={} branchId={}", productId, branchId, ex));
+    }
+
+    @Override
+    public Mono<Product> findByIdAndBranch(Integer productId, Integer branchId) {
+        log.debug("Finding product by id={} and branchId={}", productId, branchId);
+        return productDataRepository.findByIdAndBranch(productId, branchId)
+                .doOnSuccess(entity -> {
+                    if (entity != null) {
+                        log.info("Product found: {}", entity);
+                    } else {
+                        log.warn("Product not found for id={} in branchId={}", productId, branchId);
+                    }
+                })
+                .doOnError(ex -> log.error("Error finding product by id={} and branchId={}", productId, branchId, ex))
+                .map(ProductEntity::toDomain);
     }
 }

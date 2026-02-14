@@ -4,6 +4,7 @@ import co.com.bancolombia.api.dto.ProductRequest;
 import co.com.bancolombia.api.dto.ProductResponse;
 import co.com.bancolombia.api.dto.UpdateProductNameRequest;
 import co.com.bancolombia.api.dto.UpdateProductStockRequest;
+import co.com.bancolombia.model.branch.gateways.BranchRepository;
 import co.com.bancolombia.model.product.Product;
 import co.com.bancolombia.usecase.product.ProductUseCase;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +21,7 @@ import reactor.core.publisher.Mono;
 public class ProductHandler {
 
     private final ProductUseCase productUseCase;
+    private final BranchRepository branchRepository;
 
     public Mono<ServerResponse> create(ServerRequest request) {
         return request.bodyToMono(ProductRequest.class)
@@ -30,7 +32,7 @@ public class ProductHandler {
                         .build()
                 )
                 .flatMap(productUseCase::create)
-                .map(this::toResponse)
+                .flatMap(this::toResponse)
                 .flatMap(response -> ServerResponse.ok()
                         .contentType(MediaType.APPLICATION_JSON)
                         .bodyValue(response))
@@ -45,7 +47,7 @@ public class ProductHandler {
         Integer id = Integer.valueOf(request.pathVariable("id"));
 
         return productUseCase.findById(id)
-                .map(this::toResponse)
+                .flatMap(this::toResponse)
                 .flatMap(response -> ServerResponse.ok()
                         .contentType(MediaType.APPLICATION_JSON)
                         .bodyValue(response))
@@ -54,37 +56,43 @@ public class ProductHandler {
     }
 
     public Mono<ServerResponse> updateName(ServerRequest request) {
-        Integer id = Integer.valueOf(request.pathVariable("id"));
+        Integer productId = Integer.valueOf(request.pathVariable("id"));
+        Integer branchId = Integer.valueOf(request.queryParam("branchId")
+                .orElseThrow(() -> new IllegalArgumentException("branchId is required!")));
 
         return request.bodyToMono(UpdateProductNameRequest.class)
-                .flatMap(dto -> productUseCase.updateName(id, dto.getName()))
-                .map(this::toResponse)
+                .flatMap(dto -> productUseCase.updateName(productId, branchId, dto.getName()))
+                .flatMap(this::toResponse)
                 .flatMap(response -> ServerResponse.ok()
                         .contentType(MediaType.APPLICATION_JSON)
                         .bodyValue(response))
                 .switchIfEmpty(ServerResponse.notFound().build())
-                .doOnError(ex -> log.error("Error updating product name for id: {}", id, ex));
+                .doOnError(ex -> log.error("Error updating product name for productId={} and branchId={}", productId, branchId, ex));
     }
 
     public Mono<ServerResponse> updateStock(ServerRequest request) {
-        Integer id = Integer.valueOf(request.pathVariable("id"));
+        Integer productId = Integer.valueOf(request.pathVariable("id"));
+        Integer branchId = Integer.valueOf(request.queryParam("branchId")
+                .orElseThrow(() -> new IllegalArgumentException("branchId is required!")));
 
         return request.bodyToMono(UpdateProductStockRequest.class)
-                .flatMap(dto -> productUseCase.updateStock(id, dto.getStock()))
-                .map(this::toResponse)
+                .flatMap(dto -> productUseCase.updateStock(productId, branchId, dto.getStock()))
+                .flatMap(this::toResponse)
                 .flatMap(response -> ServerResponse.ok()
                         .contentType(MediaType.APPLICATION_JSON)
                         .bodyValue(response))
                 .switchIfEmpty(ServerResponse.notFound().build())
-                .doOnError(ex -> log.error("Error updating product stock for id: {}", id, ex));
+                .doOnError(ex -> log.error("Error updating product stock for productId={} and branchId={}", productId, branchId, ex));
     }
 
     public Mono<ServerResponse> delete(ServerRequest request) {
-        Integer id = Integer.valueOf(request.pathVariable("id"));
+        Integer productId = Integer.valueOf(request.pathVariable("id"));
+        Integer branchId = Integer.valueOf(request.queryParam("branchId")
+                .orElseThrow(() -> new IllegalArgumentException("branchId is required")));
 
-        return productUseCase.delete(id)
+        return productUseCase.delete(productId, branchId)
                 .then(ServerResponse.noContent().build())
-                .doOnError(ex -> log.error("Error deleting product by id: {}", id, ex));
+                .doOnError(ex -> log.error("Error deleting product with id={} and branchId={}", productId, branchId, ex));
     }
 
     public Mono<ServerResponse> findMaxStockByFranchise(ServerRequest request) {
@@ -94,18 +102,21 @@ public class ProductHandler {
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(
                         productUseCase.findMaxStockByFranchise(franchiseId)
-                                .map(this::toResponse),
+                                .flatMap(this::toResponse),
                         ProductResponse.class
                 )
                 .doOnError(ex -> log.error("Error finding max stock products by franchiseId: {}", franchiseId, ex));
     }
 
-    private ProductResponse toResponse(Product product) {
-        return ProductResponse.builder()
-                .id(product.getId())
-                .name(product.getName())
-                .stock(product.getStock())
-                .branchId(product.getBranchId())
-                .build();
+    public Mono<ProductResponse> toResponse(Product product) {
+        return branchRepository.findById(product.getBranchId())
+                .map(branch -> ProductResponse.builder()
+                        .id(product.getId())
+                        .name(product.getName())
+                        .stock(product.getStock())
+                        .branchId(product.getBranchId())
+                        .branchName(branch.getName())
+                        .build()
+                );
     }
 }
