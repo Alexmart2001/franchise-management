@@ -26,6 +26,10 @@ public class BranchRepositoryAdapter implements BranchRepository {
                 .map(BranchEntity::toDomain);
     }
 
+    /**
+     * Este metodo convierte el objeto de dominio (Branch) en una entidad persistente (BranchEntity),
+     * asegurando que se mantengan las reglas de negocio durante la persistencia.
+     */
     @Override
     public Mono<Branch> findById(Integer id) {
         log.debug("Finding branch by id: {}", id);

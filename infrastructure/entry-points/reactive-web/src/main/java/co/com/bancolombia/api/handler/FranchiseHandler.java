@@ -38,6 +38,11 @@ public class FranchiseHandler {
                 .doOnError(ex -> log.error("Error creating franchise", ex));
     }
 
+    /**
+     * Metodo exclusivo de validacion interna.
+     * Este no se expone directamente en el router, pero se utiliza para garantizar que
+     * una franquicia exista antes de realizar operaciones como actualizar o eliminar.
+     */
     public Mono<ServerResponse> findById(ServerRequest request) {
         Integer id = Integer.valueOf(request.pathVariable("id"));
 
