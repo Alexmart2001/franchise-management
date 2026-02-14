@@ -33,7 +33,7 @@ public class ProductUseCase {
     public Mono<Product> updateStock(Integer productId, Integer branchId, Integer newStock) {
         return validateId(productId)
                 .then(validateStock(newStock))
-                .then(productRepository.findByIdAndBranch(productId, branchId)) // Busca el producto con productId y branchId
+                .then(productRepository.findByIdAndBranch(productId, branchId))
                 .map(product -> product.toBuilder()
                         .stock(newStock)
                         .build())
