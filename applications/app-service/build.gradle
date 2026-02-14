@@ -1,24 +1,16 @@
 apply plugin: 'org.springframework.boot'
 
 dependencies {
+	testImplementation 'tools.jackson.core:jackson-databind'
     implementation 'org.reactivecommons.utils:object-mapper:0.1.0'
     implementation project(':r2dbc-postgresql')
     implementation project(':reactive-web')
     implementation project(':model')
     implementation project(':usecase')
     implementation 'org.springframework.boot:spring-boot-starter'
-    implementation 'org.springframework.boot:spring-boot-starter-webflux'
-    implementation 'org.springframework.boot:spring-boot-starter-data-r2dbc'
-    implementation 'io.r2dbc:r2dbc-postgresql:0.8.13.RELEASE'
-    implementation 'org.projectlombok:lombok'
-    implementation 'com.ongres.scram:client:2.1'
-    implementation 'com.ongres.scram:common:2.1'
-    annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
-    annotationProcessor 'org.projectlombok:lombok'
-    runtimeOnly 'org.postgresql:postgresql'
     runtimeOnly('org.springframework.boot:spring-boot-devtools')
     testImplementation 'com.tngtech.archunit:archunit:1.4.1'
-    testImplementation 'tools.jackson.core:jackson-databind'
+    testImplementation 'com.fasterxml.jackson.core:jackson-databind'
 }
 
 tasks.register('explodedJar', Copy) {
@@ -27,16 +19,11 @@ tasks.register('explodedJar', Copy) {
 }
 
 jar {
+    // To disable the *-plain.jar
     enabled = false
 }
 
 bootJar {
+    // Sets output jar name
     archiveFileName = "${project.getParent().getName()}.${archiveExtension.get()}"
-}
-
-configurations.all {
-    resolutionStrategy {
-        force 'com.ongres.scram:client:2.1'
-        force 'com.ongres.scram:common:2.1'
-    }
 }
